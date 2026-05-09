@@ -1,0 +1,9 @@
+{
+  "api_key": "LiThfizk8nEnR1kF40fD",
+  "model_id": "weird-gamer/yolo-world-large-demo",
+  "api_url": "https://serverless.roboflow.com",
+  "confidence": "3",
+  "classes": "soccer goal, ball in goal, goal celebration, player shooting at goal, yellow card, red card, referee card, shot, pass, sliding tackle, player tackling opponent, football tackle, possession change",
+  "sample_step_seconds": "0.5",
+  "max_frames": "600"
+}
