@@ -1,0 +1,4 @@
+Flask==3.0.3
+imageio-ffmpeg>=0.5.1
+inference-sdk>=0.59.0; python_version < "3.13"
+requests>=2.31.0

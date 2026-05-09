@@ -1,0 +1,39 @@
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5001
+Press CTRL+C to quit
+127.0.0.1 - - [09/May/2026 01:38:05] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/May/2026 01:38:19] "GET / HTTP/1.1" 200 -
+[2026-05-09 01:54:46,951] ERROR in app: Exception on /events [GET]
+Traceback (most recent call last):
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\.Me\.Semester 6\Coding\Python\VS Code\IDS Theory\Football Analysis Model\app.py", line 960, in events
+    )
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\.Me\.Semester 6\Coding\Python\VS Code\IDS Theory\Football Analysis Model\templates\events.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\.Me\.Semester 6\Coding\Python\VS Code\IDS Theory\Football Analysis Model\templates\base.html", line 42, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\.Me\.Semester 6\Coding\Python\VS Code\IDS Theory\Football Analysis Model\templates\events.html", line 31, in block 'content'
+    <input name="api_key" type="password" value="{{ form_data.get('api_key', '') }}" placeholder="{{ 'Configured in environment' if status.api_key else 'Paste API key for this run' }}">
+    ^^^^^^^^^^^^^^^
+  File "C:\Users\wasay\miniconda3\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'form_data' is undefined
+127.0.0.1 - - [09/May/2026 01:54:47] "GET /events HTTP/1.1" 500 -

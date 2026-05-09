@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Event Detection | Football Intelligence{% endblock %}
+
+{% block content %}
+<section class="page-hero compact">
+  <div>
+    <p class="eyebrow">Part C - Event Detection</p>
+    <h1>Detect match events through a hosted API.</h1>
+    <p>Upload a match video, send sampled frames to a hosted Roboflow model, then review event reports and clips for goals, cards, and tackles.</p>
+  </div>
+</section>
+
+<section class="content-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Video Upload</h2>
+      <span class="badge">{{ "Configured" if status.configured else "Needs API config" }}</span>
+    </div>
+    <form class="upload-form js-loading-form" method="post" enctype="multipart/form-data">
+      <label class="file-drop" for="event_file">
+        <input id="event_file" name="event_file" type="file" accept="video/*,image/*" required>
+        <span class="file-title">Choose a match video</span>
+        <span class="file-subtitle" data-file-name>Goals, cards, and tackles can create downloadable clips when detected.</span>
+      </label>
+      <video class="upload-preview" controls preload="metadata" data-video-preview hidden></video>
+
+      <div class="form-grid">
+        <label>
+          <span>Roboflow API key</span>
+          <input name="api_key" type="password" value="{{ form_data.get('api_key', '') }}" placeholder="{{ 'Configured in environment' if status.api_key else 'Paste API key for this run' }}">
+        </label>
+        <label>
+          <span>Workflow or hosted model ID</span>
+          <input name="model_id" type="text" value="{{ form_data.get('model_id', status.model_id) }}" placeholder="weird-gamer/yolo-world-large-demo">
+        </label>
+        <label>
+          <span>API URL</span>
+          <input name="api_url" type="text" value="{{ form_data.get('api_url', status.api_url) }}" placeholder="https://serverless.roboflow.com">
+        </label>
+        <label>
+          <span>Confidence threshold</span>
+          <input name="confidence" type="number" min="1" max="100" value="{{ form_data.get('confidence', status.confidence) }}">
+        </label>
+        <label>
+          <span>Sample every seconds</span>
+          <input name="sample_step_seconds" type="number" min="0.25" max="20" step="0.25" value="{{ form_data.get('sample_step_seconds', status.sample_step_seconds) }}">
+        </label>
+        <label>
+          <span>Maximum frames sent</span>
+          <input name="max_frames" type="number" min="1" max="600" value="{{ form_data.get('max_frames', status.max_frames) }}">
+        </label>
+        <label>
+          <span>YOLO-World classes</span>
+          <input name="classes" type="text" value="{{ form_data.get('classes', status.classes) }}">
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit">
+        <span class="btn-label">Run Event Detection</span>
+        <span class="spinner" aria-hidden="true"></span>
+      </button>
+      <div class="inline-loader"><span class="loader-ring"><span class="loader-percent">0%</span></span><strong>Calling hosted event API and preparing clips...</strong></div>
+    </form>
+  </div>
+
+  <aside class="panel feature-panel">
+    <div class="panel-header"><h2>API Status</h2></div>
+    <dl class="stats-list">
+      <div><dt>API Key</dt><dd>{{ "Configured" if status.api_key else "Missing" }}</dd></div>
+      <div><dt>Target</dt><dd>{{ status.model_id or "Missing" }}</dd></div>
+      <div><dt>Mode</dt><dd>{{ status.mode }}</dd></div>
+      <div><dt>API URL</dt><dd>{{ status.api_url }}</dd></div>
+    </dl>
+    <div class="mini-report">
+      <h3>Report Events</h3>
+      <p class="muted">Goals, yellow cards, red cards, shots, passes, tackles, and possession changes.</p>
+      <h3>Clip Events</h3>
+      <p class="muted">Only goals, cards, and tackles are clipped for download.</p>
+    </div>
+  </aside>
+</section>
+
+{% if result %}
+<section class="results-section">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Result</p>
+        <h2>{{ result.title }}</h2>
+      </div>
+      <div class="button-row slim">
+        <a class="btn secondary" href="{{ url_for('download', filename=result.download_file) }}">PDF</a>
+        <a class="btn ghost" href="{{ url_for('download', filename=result.download_csv) }}">CSV</a>
+        <a class="btn ghost" href="{{ url_for('download', filename=result.download_json) }}">JSON</a>
+      </div>
+    </div>
+
+    <dl class="breakdown-grid">
+      {% for key, value in result.summary.items() %}
+        <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+      {% endfor %}
+    </dl>
+
+    <div class="mini-report full-report">
+      <h3>General Event Report</h3>
+      <dl class="stats-list">
+        {% for key, value in result.counts.items() %}
+          <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+        {% endfor %}
+      </dl>
+    </div>
+
+    {% if result.clips %}
+      <div class="event-clip-grid">
+        {% for clip in result.clips %}
+          <div class="mini-report event-clip-card">
+            <h3>{{ clip.title }}</h3>
+            <video class="result-video compact-video" controls preload="metadata">
+              <source src="{{ url_for('static', filename=clip.static_path) }}">
+            </video>
+            <p class="muted">{{ clip.what_happened }}</p>
+            <div class="button-row">
+              <a class="btn secondary" href="{{ url_for('download', filename=clip.file) }}">Download Clip</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="mini-report full-report">
+        <h3>Event Clips</h3>
+        <p class="muted">No goals, cards, or tackles clips were created from the detected API labels.</p>
+      </div>
+    {% endif %}
+
+    {% if result.rows %}
+      <div class="panel-header table-header">
+        <div>
+          <p class="eyebrow">Detected Values</p>
+          <h2>Event Rows</h2>
+        </div>
+        <div class="button-row slim">
+          <a class="btn secondary" href="{{ url_for('download', filename=result.download_csv) }}">Download Report Values</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time Sec</th>
+              <th>Event</th>
+              <th>Where</th>
+              <th>What Happened</th>
+              <th>API Label</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in result.rows %}
+              <tr>
+                <td>{{ row.time_sec }}</td>
+                <td>{{ row.event }}</td>
+                <td>{{ row.where }}</td>
+                <td>{{ row.what_happened }}</td>
+                <td>{{ row.api_label }}</td>
+                <td>{{ row.confidence }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">The API returned no supported event labels for the sampled frames.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

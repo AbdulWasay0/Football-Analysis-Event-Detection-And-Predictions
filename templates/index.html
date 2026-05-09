@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Football Intelligence{% endblock %}
+
+{% block content %}
+<section class="hero dashboard-hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Integrated analysis workspace</p>
+    <h1>Football video analysis and transfer valuation in one clean interface.</h1>
+    <p class="hero-text">Upload match footage for tracking insights, or estimate player market value from the transfer prediction system already in your project.</p>
+  </div>
+  <div class="metrics-strip" aria-label="Dashboard features">
+    <div><strong>Video</strong><span>Tracking and possession</span></div>
+    <div><strong>ML</strong><span>Transfer fee prediction</span></div>
+    <div><strong>Events</strong><span>API-only detection</span></div>
+    <div><strong>Export</strong><span>PDF, CSV, and JSON</span></div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="section-heading">
+    <p class="eyebrow">Choose a module</p>
+    <h2>Start with the workflow you need</h2>
+  </div>
+
+  <div class="module-grid three">
+    <a class="module-card" href="{{ url_for('football') }}">
+      <div class="card-icon">&#9654;</div>
+      <h3>Football Analysis</h3>
+      <p>Upload a video, preview it, run tracking, inspect possession, speed estimates, pitch maps, heatmaps, and exports.</p>
+      <span class="card-action">Open analysis</span>
+    </a>
+    <a class="module-card" href="{{ url_for('transfer') }}">
+      <div class="card-icon">&euro;</div>
+      <h3>Transfer Fee Prediction</h3>
+      <p>Predict transfer fee, inspect confidence ranges, market context, value trends, similar transfers, and charts.</p>
+      <span class="card-action">Open predictor</span>
+    </a>
+    <a class="module-card" href="{{ url_for('events') }}">
+      <div class="card-icon">EV</div>
+      <h3>Event Detection</h3>
+      <p>Sample video frames and send them to a configured hosted API for goals, cards, shots, passes, tackles, and possession changes.</p>
+      <span class="card-action">Open events</span>
+    </a>
+  </div>
+</section>
+{% endblock %}
